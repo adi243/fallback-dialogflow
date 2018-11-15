@@ -59,7 +59,7 @@ class DialogFallback(FallbackSkill):
 
         else:
 
-           self.speak_dialog(reply)
+           self.speak(reply)
 
            return True
 		     
