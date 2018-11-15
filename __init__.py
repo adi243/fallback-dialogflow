@@ -51,6 +51,7 @@ class DialogFallback(FallbackSkill):
 
         reply = response.query_result.fulfillment_text
 
+        print reply
 
         if reply == '':	
 
