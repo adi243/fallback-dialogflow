@@ -1,1 +1,1 @@
-dialogflow_v2
+dialogflow
