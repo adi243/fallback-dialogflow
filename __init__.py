@@ -6,7 +6,7 @@ import uuid
 import os
 import dialogflow_v2 as dialogflow
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/ilabs/chatbot_ws/fallback-dialogflow/MyRobo-b0081c95313a.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/ilabs/chatbot_ws/MyRobo-b0081c95313a.json'
 
 class DialogFallback(FallbackSkill):
     """
