@@ -1,52 +1,75 @@
+
 from mycroft.skills.core import FallbackSkill
 
 
-class MeaningFallback(FallbackSkill):
+import uuid
+import os
+import dialogflow_v2 as dialogflow
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'MyRobo-b0081c95313a.json'
+
+class DialogFallback(FallbackSkill):
     """
-        A Fallback skill to answer the question about the
-        meaning of life, the universe and everything.
+        A Fallback skill to access the Dialogflow api for specific scripted questions.
     """
     def __init__(self):
-        super(MeaningFallback, self).__init__(name='Meaning Fallback')
+        super(DialogFallback, self).__init__(name='Dialog Fallback')
 
     def initialize(self):
         """
-            Registers the fallback skill
+            Registers the fallback skill, in this case I'll connect to dialogflow for a possible response.
         """
-        self.register_fallback(self.handle_fallback, 1)
+        self.register_fallback(self.check_dialogflow, 10)
         # Any other initialize code goes here
 
-    def handle_fallback(self, message):
+    def check_dialogflow(self, message):
         """
-            Answers question about the meaning of life, the universe
-            and everything.
+            Ask DialogFlow if there is a matching intent.
         """
-        utterance = message.data.get("utterance")
+        project_id = 'myrobo-5b4b5'
 
-        # get keywords for current language
-        what = self.dialog_renderer.render('query')
-        meaning = self.dialog_renderer.render('meaning')
-        life = self.dialog_renderer.render('life')
-        universe = self.dialog_renderer.render('universe')
-        everything = self.dialog_renderer.render('everything')
+        session_id = str(uuid.uuid4())
 
-        if what in utterance \
-            and meaning in utterance \
-            and (life in utterance \
-                or universe in utterance \
-                or everything in utterance):
-            self.speak('42')
-            return True # Indicate that the utterance was handled
+        language_code = 'en-US'
+
+        texts = message.data.get("utterance")
+
+	
+        session_client = dialogflow.SessionsClient()
+
+
+        session = session_client.session_path(project_id, session_id)
+
+        print('Session path: {}\n'.format(session)) ## To be commented out after testing, To check for api connection
+
+        #for text in texts:
+        text_input = dialogflow.types.TextInput(text=texts, language_code=language_code)
+
+        query_input = dialogflow.types.QueryInput(text=text_input)
+
+        response = session_client.detect_intent(session=session, query_input=query_input)
+
+        reply = response.query_result.fulfillment_text
+
+
+        if reply == '':	
+
+           return False
+
         else:
-            return False
+
+           self.speak_dialog(reply)
+
+           return True
+		     
 
     def shutdown(self):
         """
             Remove this skill from list of fallback skills.
         """
-        self.remove_fallback(self.handle_fallback)
-        super(MeaningFallback, self).shutdown()
+        self.remove_fallback(self.check_dialogflow)
+        super(DialogFallback, self).shutdown()
 
 
 def create_skill():
-    return MeaningFallback()
+    return DialogFallback()
