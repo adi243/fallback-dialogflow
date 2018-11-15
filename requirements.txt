@@ -1,1 +1,2 @@
 dialogflow
+protobuf>=3.4.0
